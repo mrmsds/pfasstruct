@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from contextlib import closing
-from indigo import Indigo, IndigoException
+from rdkit.Chem import MolFromSmiles, MolFromSmarts
 from mysql.connector import connect
 from numpy import array, sum
 from pandas import read_sql_query
@@ -9,7 +9,7 @@ from warnings import filterwarnings
 # Parse CLA
 parser = ArgumentParser(description='desc: a command-line utility that identifies structures from DSSTOX matching a fraction-fluorine and/or substructure-based definition of PFAS')
 parser.add_argument('-f', '--fracf', type=float, help='minimum fraction of fluorine atoms for PFAS definition')
-parser.add_argument('-s', '--subs', nargs='*', help='SMARTS or SMILES substructure query strings for PFAS definition')
+parser.add_argument('-s', '--subs', nargs='*', help='SMARTS substructure query strings for PFAS definition')
 parser.add_argument('-u', '--user', help='DSSTOX database username', required=True)
 parser.add_argument('-p', '--pwd', help='DSSTOX database password', required=True)
 parser.add_argument('-l', '--loc', help='DSSTOX database location/hostname', required=True)
@@ -42,38 +42,33 @@ filterwarnings('ignore', category=UserWarning)
 with closing(connect(**config)) as conn:
     cmpds = read_sql_query(query, conn)
 
-# Initialize Indigo instance
-indigo = Indigo()
-
 # Compute fraction fluorine atoms (# F / # !H) from an Indigo molecule
 def fracf(mol):
-    el = array([a.atomicNumber() for a in mol.iterateAtoms()])
+    el = array([a.GetAtomicNum() for a in mol.GetAtoms()])
     return sum(el == 9) / sum(el > 1)
 
-# Convert input substructure strings to Indigo query molecules
-qmols = [indigo.loadQueryMolecule(s) for s in args.subs]
-
+# Convert input substructure SMARTS to query molecules
+qmols = [MolFromSmarts(sma) for sma in args.subs]
 # Match a molecule against all input query molecule substructures
 def subs(mol):
-    matcher = indigo.substructureMatcher(mol)
-    return [str(i + 1) for i, q in enumerate(qmols) if matcher.match(q)]
+    return [str(i + 1) for i, q in enumerate(qmols) if mol.HasSubstructMatch(q)]
 
 # Test a SMILES string against both components of the PFAS definition
 def test(smi):
     results = []
     try:
-        mol = indigo.loadMolecule(smi)
+        mol = MolFromSmiles(smi)
         try:
             if fracf(mol) >= args.fracf:
                 results.append('F')
-        except IndigoException:
+        except:
             pass
 
         try:
             results.extend(subs(mol))
-        except IndigoException:
+        except:
             pass
-    except IndigoException:
+    except:
         pass
 
     return '.'.join(results)
