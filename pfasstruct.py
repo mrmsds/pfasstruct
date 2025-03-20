@@ -33,7 +33,6 @@ query = ('SELECT gs.dsstox_substance_id AS DTXSID, c.dsstox_compound_id AS DTXCI
          'JOIN generic_substances gs ON gs.id = gsc.fk_generic_substance_id '
          'WHERE c.mol_formula REGEXP BINARY \'F[^a-z]\' ' # Has fluorine
          'AND c.mol_formula REGEXP BINARY \'C[^a-z]\' ' # Has carbon
-         'AND (c.smiles REGEXP BINARY \'F[)]?C\' OR c.smiles REGEXP BINARY \'C[(]?F\') ' # Has C-F single bond
          'AND NOT c.mol_file LIKE \'%RAD%\'') # Has no radicals
 
 # Ignore MySQL/pandas warnings
@@ -42,7 +41,7 @@ filterwarnings('ignore', category=UserWarning)
 with closing(connect(**config)) as conn:
     cmpds = read_sql_query(query, conn)
 
-# Compute fraction fluorine atoms (# F / # !H) from an Indigo molecule
+# Compute fraction fluorine atoms (# F / # !H) from a molecule
 def fracf(mol):
     el = array([a.GetAtomicNum() for a in mol.GetAtoms()])
     return sum(el == 9) / sum(el > 1)
@@ -53,21 +52,27 @@ qmols = [MolFromSmarts(sma) for sma in args.subs]
 def subs(mol):
     return [str(i + 1) for i, q in enumerate(qmols) if mol.HasSubstructMatch(q)]
 
+# Define C-F single bond substructure query
+cfqmol = MolFromSmarts("[c,C]-F")
 # Test a SMILES string against both components of the PFAS definition
 def test(smi):
     results = []
     try:
-        mol = MolFromSmiles(smi)
-        try:
-            if fracf(mol) >= args.fracf:
-                results.append('F')
-        except:
-            pass
+        mol = MolFromSmiles(smi, sanitize=False)
+        # Require C-F single bond to proceed
+        if mol.HasSubstructMatch(cfqmol):
+            # Check fraction-fluorine definition
+            try:
+                if fracf(mol) >= args.fracf:
+                    results.append('F')
+            except:
+                pass
 
-        try:
-            results.extend(subs(mol))
-        except:
-            pass
+            # Check substructure definition
+            try:
+                results.extend(subs(mol))
+            except:
+                pass
     except:
         pass
 
