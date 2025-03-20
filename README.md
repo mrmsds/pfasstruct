@@ -1,5 +1,5 @@
 # PFASSTRUCT
-Command-line utility to generate iterations of the PFASSTRUCT lists based on a fraction-fluorine and/or substructure-based definition
+Command-line utility to generate iterations of the PFASSTRUCT lists matching a fraction-fluorine and/or substructure-based definition
 
 ## HELP
 ```
@@ -20,15 +20,15 @@ options:
 
 ## POWERSHELL
 ```
-.\pfasstruct -u YOUR_DSSTOX_USER -p YOUR_DSSTOX_PASS -l mysql-ip-m.epa.gov -f 0.3 -s "C(F)(F)(C(F))F" "FC(F)(F)(C~C(F)(F))" "C(F)(F)(C(F)(F))" "C(F)(F)[B,O,N,P,S,Si]C(F)(F)" -t pfasstruct_test.xlsx
+.\pfasstruct -u YOUR_DSSTOX_USERNAME -p YOUR_DSSTOX_PASSWORD -l mysql-ip-m.epa.gov -f 0.3 -s "C(F)(F)(C(F))F" "C(F)(F)(C(F)(F))" "FC(F)(F)(C~C(F)(F))" "C(F)(F)[B,O,N,P,S,Si]C(F)(F)" -t pfasstruct.xlsx
 ```
 
 ## CMD
 ```
-pfasstruct -u YOUR_DSSTOX_USER -p YOUR_DSSTOX_PASS -l mysql-ip-m.epa.gov -f 0.3 -s C(F)(F)(C(F))F FC(F)(F)(C~C(F)(F)) C(F)(F)(C(F)(F)) C(F)(F)[B,O,N,P,S,Si]C(F)(F) -t pfasstruct_test.xlsx
+pfasstruct -u YOUR_DSSTOX_USERNAME -p YOUR_DSSTOX_PASSWORD -l mysql-ip-m.epa.gov -f 0.3 -s C(F)(F)(C(F))F C(F)(F)(C(F)(F)) FC(F)(F)(C~C(F)(F)) C(F)(F)[B,O,N,P,S,Si]C(F)(F) -t pfasstruct.xlsx
 ```
 
 ## PYTHON
 ```
-py pfasstruct.py -u YOUR_DSSTOX_USER -p YOUR_DSSTOX_PASS -l mysql-ip-m.epa.gov -f 0.3 -s C(F)(F)(C(F))F FC(F)(F)(C~C(F)(F)) C(F)(F)(C(F)(F)) C(F)(F)[B,O,N,P,S,Si]C(F)(F) -t pfasstruct_test.xlsx
+py pfasstruct.py -u YOUR_DSSTOX_USERNAME -p YOUR_DSSTOX_PASSWORD -l mysql-ip-m.epa.gov -f 0.3 -s C(F)(F)(C(F))F C(F)(F)(C(F)(F)) FC(F)(F)(C~C(F)(F)) C(F)(F)[B,O,N,P,S,Si]C(F)(F) -t pfasstruct.xlsx
 ```

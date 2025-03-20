@@ -6,6 +6,11 @@
 # Batch files for testing (contain credentials)
 *.bat
 
+# Binaries
+*.zip
+*.exe
+*.7z
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
