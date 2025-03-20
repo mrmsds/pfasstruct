@@ -18,12 +18,17 @@ options:
   -t, --tofile TOFILE   XLSX filename to write output
 ```
 
-## EXE EXAMPLE
+## POWERSHELL
+```
+.\pfasstruct -u YOUR_DSSTOX_USER -p YOUR_DSSTOX_PASS -l mysql-ip-m.epa.gov -f 0.3 -s "C(F)(F)(C(F))F" "FC(F)(F)(C~C(F)(F))" "C(F)(F)(C(F)(F))" "C(F)(F)[B,O,N,P,S,Si]C(F)(F)" -t pfasstruct_test.xlsx
+```
+
+## CMD
 ```
 pfasstruct -u YOUR_DSSTOX_USER -p YOUR_DSSTOX_PASS -l mysql-ip-m.epa.gov -f 0.3 -s C(F)(F)(C(F))F FC(F)(F)(C~C(F)(F)) C(F)(F)(C(F)(F)) C(F)(F)[B,O,N,P,S,Si]C(F)(F) -t pfasstruct_test.xlsx
 ```
 
-## PY EXAMPLE
+## PYTHON
 ```
 py pfasstruct.py -u YOUR_DSSTOX_USER -p YOUR_DSSTOX_PASS -l mysql-ip-m.epa.gov -f 0.3 -s C(F)(F)(C(F))F FC(F)(F)(C~C(F)(F)) C(F)(F)(C(F)(F)) C(F)(F)[B,O,N,P,S,Si]C(F)(F) -t pfasstruct_test.xlsx
 ```
