@@ -34,7 +34,7 @@ query = ('SELECT gs.dsstox_substance_id AS DTXSID, c.dsstox_compound_id AS DTXCI
          'WHERE c.mol_formula REGEXP BINARY \'F[^A-Za-z]\' ' # Has >1 fluorine
          'AND c.mol_formula REGEXP BINARY \'C[^a-z]\' ' # Has carbon
          'AND NOT c.mol_file LIKE \'%RAD%\' ' # Has no radicals
-         'AND NOT gsc.relationship LIKE \'Markush%\'') # Non-Markush structures
+         'AND NOT gsc.relationship LIKE \'Markush%\'') # Remove Markush structures
 
 # Ignore MySQL/pandas warnings
 filterwarnings('ignore', category=UserWarning)
