@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from contextlib import closing
-from rdkit.Chem import MolFromSmiles, MolFromSmarts
+from rdkit.Chem import MolFromSmiles, MolFromSmarts, GetSymmSSSR
 from mysql.connector import connect
 from numpy import array, sum
 from pandas import read_sql_query
@@ -42,25 +42,31 @@ filterwarnings('ignore', category=UserWarning)
 with closing(connect(**config)) as conn:
     cmpds = read_sql_query(query, conn)
 
+# Read a SMILES or SMARTS string without sanitizing, then initialize query information
+def mol_from_str(str, smarts=False):
+    mol = MolFromSmarts(str) if smarts else MolFromSmiles(str, sanitize=False)
+    mol.UpdatePropertyCache(strict=False)
+    GetSymmSSSR(mol)
+    return mol
+
 # Compute fraction fluorine atoms (# F / # !H) from a molecule
 def fracf(mol):
     el = array([a.GetAtomicNum() for a in mol.GetAtoms()])
     return sum(el == 9) / sum(el > 1)
 
 # Convert input substructure SMARTS to query molecules
-qmols = [MolFromSmarts(sma) for sma in args.subs]
+qmols = [mol_from_str(sma, smarts=True) for sma in args.subs]
 # Match a molecule against all input query molecule substructures
 def subs(mol):
     return [str(i + 1) for i, q in enumerate(qmols) if mol.HasSubstructMatch(q)]
 
 # Define C-F single bond substructure query
-cfqmol = MolFromSmarts("[c,C]-F")
+cfqmol = mol_from_str('[c,C]-F', smarts=True)
 # Test a SMILES string against both components of the PFAS definition
 def test(smi):
     results = []
     try:
-        mol = MolFromSmiles(smi, sanitize=False)
-        mol.UpdatePropertyCache(strict=False)
+        mol = mol_from_str(smi)
         # Require C-F single bond to proceed
         if mol.HasSubstructMatch(cfqmol):
             # Check fraction-fluorine definition
