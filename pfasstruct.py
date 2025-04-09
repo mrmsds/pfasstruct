@@ -60,6 +60,7 @@ def test(smi):
     results = []
     try:
         mol = MolFromSmiles(smi, sanitize=False)
+        mol.UpdatePropertyCache(strict=False)
         # Require C-F single bond to proceed
         if mol.HasSubstructMatch(cfqmol):
             # Check fraction-fluorine definition
